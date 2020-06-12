@@ -17,6 +17,7 @@ from spl_arch.scheduler.command_exception import CommandException
 from spl_arch.parser import AntlrParser
 from spl_arch.parser.dummy_adapter import DummyAdapter
 
+
 class Executor(object):
     """
         spl bootstrap
@@ -46,9 +47,9 @@ class Executor(object):
         # parse module
         # input -> pipe_cmd
         # output -> collection of opts
-        antlr_parser = AntlrParser("antlr", spl_cmd)
+        antlr_parser = AntlrParser()
         antlr_parser.validate()
-        opts = antlr_parser.parse()
+        opts = antlr_parser.parse("")
 
         # schedule module
         scheduler = Scheduler("scheduler")
@@ -73,7 +74,6 @@ class Executor(object):
         """
         # input module
         spl_cmd = SplInput().get_input()  # search repo="mytest"
-        # spl_cmd = '"search indexer="hello" | replace "hello" with "world" in class | stats avg(math) as avg_math by class"'
 
         # parse module
         # input -> pipe_cmd
@@ -83,7 +83,6 @@ class Executor(object):
         # antlr_parser.validate()
         opts = [dummy_adapter.convert(c) for c in antlr_parser.parse(spl_cmd)]
 
-        # encapsulate cmd_opt object and build input_output stream
         # encapsulate cmd_opt object and build input_output stream
         def stream_builder(cmd_opts, ex_lock, ex, stream_class):
             input_stream = None
@@ -123,8 +122,8 @@ class Executor(object):
 
         lock = Lock()
         exception = CommandException(lock)
-        result_stream, all_stream= stream_builder(opts, lock, exception, LocalMemoryQueue)
-        # result_stream = stream_builder(opts, lock, exception, MysqlStream)
+        # result_stream, all_stream = stream_builder(opts, lock, exception, LocalMemoryQueue)
+        result_stream, all_stream = stream_builder(opts, lock, exception, MysqlStream)
 
         # schedule module
         from spl_arch.scheduler.demo_scheduler import DemoScheduler
